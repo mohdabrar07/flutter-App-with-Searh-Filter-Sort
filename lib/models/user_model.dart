@@ -1,22 +1,30 @@
 class UserModel {
-  final String id;
+  final int id; // Changed to int to match the placeholder API
   final String name;
   final String email;
   final String company;
+  final String phone;   // Added for details page
+  final String website; // Added for details page
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.company,
+    required this.phone,
+    required this.website,
   });
-}
 
-final List<UserModel> mockUsers = [
-  UserModel(id: '1', name: 'Alice Smith', email: 'alice@google.com', company: 'Google'),
-  UserModel(id: '2', name: 'Bob Jones', email: 'bob@apple.com', company: 'Apple'),
-  UserModel(id: '3', name: 'Charlie Brown', email: 'charlie@google.com', company: 'Google'),
-  UserModel(id: '4', name: 'Diana Prince', email: 'diana@amazon.com', company: 'Amazon'),
-  UserModel(id: '5', name: 'Evan Wright', email: 'evan@apple.com', company: 'Apple'),
-  UserModel(id: '6', name: 'Fiona Gallagher', email: 'fiona@microsoft.com', company: 'Microsoft'),
-];
+  // Factory constructor to convert JSON map into UserModel object
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'],
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      // The API nests company inside a 'company' map object, so we look for 'name' inside it
+      company: json['company'] != null ? json['company']['name'] ?? '' : '',
+      phone: json['phone'] ?? '',
+      website: json['website'] ?? '',
+    );
+  }
+}

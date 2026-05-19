@@ -4,10 +4,22 @@ import 'widgets/search_bar_widget.dart';
 import 'widgets/filter_sort_controls.dart';
 import 'widgets/user_card.dart';
 
-class UserListScreen extends StatelessWidget {
+class UserListScreen extends StatefulWidget {
   final UserViewModel viewModel;
 
   const UserListScreen({super.key, required this.viewModel});
+
+  @override
+  State<UserListScreen> createState() => _UserListScreenState();
+}
+
+class _UserListScreenState extends State<UserListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch data over the network once when the app page initializes
+    widget.viewModel.fetchUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +32,43 @@ class UserListScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      
       body: ListenableBuilder(
-        listenable: viewModel,
+        listenable: widget.viewModel,
         builder: (context, child) {
-          final users = viewModel.filteredAndSortedUsers;
+          // A. Handle Network Loading Circle Indicator
+          if (widget.viewModel.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // B. Handle Network Connection Error Alerts
+          if (widget.viewModel.errorMessage.isNotEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.cloud_off, size: 60, color: Colors.redAccent),
+                  const SizedBox(height: 12),
+                  Text(widget.viewModel.errorMessage, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: widget.viewModel.fetchUsers,
+                    child: const Text('Retry Connection'),
+                  )
+                ],
+              ),
+            );
+          }
+
+          final users = widget.viewModel.filteredAndSortedUsers;
 
           return Column(
             children: [
-              SearchBarWidget(viewModel: viewModel),
-              FilterSortControls(viewModel: viewModel),
+              SearchBarWidget(viewModel: widget.viewModel),
+              FilterSortControls(viewModel: widget.viewModel),
               const Divider(height: 1),
               Expanded(
                 child: users.isEmpty
-                    ? _buildNoResultsScreen(viewModel)
+                    ? _buildNoResultsScreen(widget.viewModel)
                     : ListView.builder(
                         itemCount: users.length,
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -65,7 +100,7 @@ class UserListScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'We couldn\'t find any matches for "${viewModel.searchQuery}" in corporate group "${viewModel.selectedCompany}".',
+                'We couldn\'t find any matches for "${viewModel.searchQuery}" in group "${viewModel.selectedCompany}".',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/user_model.dart';
 import '../../viewmodels/user_viewmodel.dart';
 
 class FilterSortControls extends StatelessWidget {
@@ -9,8 +8,9 @@ class FilterSortControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dynamically pull company list values from the live active master users downloaded array map
     final List<String> companies = ['All'] + 
-        mockUsers.map((user) => user.company).toSet().toList();
+        viewModel.masterUsers.map((user) => user.company).toSet().toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),

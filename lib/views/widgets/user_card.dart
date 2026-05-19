@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
+import '../user_detail_screen.dart';
 
 class UserCard extends StatelessWidget {
   final UserModel user;
@@ -16,6 +17,15 @@ class UserCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: ListTile(
+        // Trigger Navigation Routine Context Event
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailScreen(user: user),
+            ),
+          );
+        },
         leading: CircleAvatar(
           backgroundColor: Colors.blueAccent.withAlpha(25),
           foregroundColor: Colors.blueAccent,
